@@ -8,13 +8,13 @@ buildscript {
         google()
         mavenCentral()
         maven {
-            url "https://plugins.gradle.org/m2/"
+      url 'https://plugins.gradle.org/m2/'
         }
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:7.1.2'
-        classpath "com.github.spotbugs.snom:spotbugs-gradle-plugin:5.0.7"
+        classpath 'com.github.spotbugs.snom:spotbugs-gradle-plugin:5.0.7'
     }
 }
 
@@ -23,16 +23,17 @@ rootProject.allprojects {
         google()
         mavenCentral()
         maven {
-            url "https://storage.googleapis.com/download.flutter.io"
+      url 'https://storage.googleapis.com/download.flutter.io'
         }
     }
 }
 
 apply plugin: 'com.android.library'
 apply plugin: 'checkstyle'
-apply plugin: "com.github.spotbugs"
+apply plugin: 'com.github.spotbugs'
 
 android {
+    namespace 'com.rollbar.flutter'
     compileSdkVersion 31
 
     compileOptions {
@@ -50,28 +51,28 @@ android {
 
     testOptions {
         unitTests.all {
-            testLogging {
-                events "passed", "skipped", "failed", "standardOut", "standardError"
-                outputs.upToDateWhen {false}
-                showStandardStreams = true
-            }
+      testLogging {
+        events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+        outputs.upToDateWhen { false }
+        showStandardStreams = true
+      }
         }
     }
 }
 
 def flutterRoot =  System.getenv()['FLUTTER_SDK']
 if (!flutterRoot) {
-    def localPropertiesFile = new File(rootProject.projectDir, "local.properties")
+  def localPropertiesFile = new File(rootProject.projectDir, 'local.properties')
 
-    if (localPropertiesFile.exists()) {
-        def properties = new Properties()
-        localPropertiesFile.withReader("UTF-8") { reader -> properties.load(reader) }
-        flutterRoot = properties.getProperty("flutter.sdk")
-    }
+  if (localPropertiesFile.exists()) {
+    def properties = new Properties()
+    localPropertiesFile.withReader('UTF-8') { reader -> properties.load(reader) }
+    flutterRoot = properties.getProperty('flutter.sdk')
+  }
 }
 
 String engineVersion = Paths
-    .get(flutterRoot, "bin", "internal", "engine.version")
+    .get(flutterRoot, 'bin', 'internal', 'engine.version')
     .toFile()
     .text
     .trim()
@@ -91,7 +92,7 @@ dependencies {
 }
 
 checkstyle {
-    toolVersion "8.2"
+    toolVersion '8.2'
 }
 
 task checkstyleMain(type: Checkstyle) {
@@ -110,8 +111,8 @@ task checkstyleMain(type: Checkstyle) {
 }
 
 def makeCheckstyleTask(sourceSet, config) {
-    def taskName = "checkstyle${sourceSet}"
-    task "$taskName"(type: Checkstyle) {
+  def taskName = "checkstyle${sourceSet}"
+  task "$taskName"(type: Checkstyle) {
         source "src/${sourceSet}"
         include '**/*.java'
         exclude '**/gen/**'
@@ -121,16 +122,16 @@ def makeCheckstyleTask(sourceSet, config) {
         configFile file("$rootDir/tools/checkstyle/${config}")
         classpath = files()
         reports {
-            xml.required = false
-            html.required = true
+      xml.required = false
+      html.required = true
         }
-    }
+  }
 
-    afterEvaluate {
-        if (project.tasks.getByName("check")) {
-            check.dependsOn(taskName)
+  afterEvaluate {
+        if (project.tasks.getByName('check')) {
+      check.dependsOn(taskName)
         }
-    }
+  }
 }
 
 makeCheckstyleTask('main', 'google_checks.xml')
@@ -148,8 +149,8 @@ task spotbugsMain(type: com.github.spotbugs.snom.SpotBugsTask) {
     dependsOn 'assemble'
 
     ignoreFailures = false
-    effort = "max"
-    reportLevel = "medium"
+    effort = 'max'
+    reportLevel = 'medium'
 
     classes = fileTree("$project.buildDir/intermediates/javac/debug/classes/")
     sourceDirs = fileTree('src/main/java')
@@ -159,27 +160,27 @@ task spotbugsMain(type: com.github.spotbugs.snom.SpotBugsTask) {
     release = project.version
     reports {
         html {
-            required = true
-            destination = file("$buildDir/reports/spotbugs/main/spotbugs.html")
-            stylesheet = 'fancy-hist.xsl'
+      required = true
+      destination = file("$buildDir/reports/spotbugs/main/spotbugs.html")
+      stylesheet = 'fancy-hist.xsl'
         }
     }
 }
 
 String flutterCompatVersion = Paths
-    .get(flutterRoot, "version")
+    .get(flutterRoot, 'version')
     .toFile()
     .text
     .trim()
 
 if (flutterCompatVersion.startsWith('1.')) {
-    android.sourceSets.test.java.srcDir file('src/testflutter1/java/')
+  android.sourceSets.test.java.srcDir file('src/testflutter1/java/')
 } else {
-    android.sourceSets.test.java.srcDir file('src/testflutter/java/')
+  android.sourceSets.test.java.srcDir file('src/testflutter/java/')
 }
 
 afterEvaluate {
-    if (project.tasks.getByName("check")) {
+    if (project.tasks.getByName('check')) {
         check.dependsOn('spotbugsMain')
     }
 }
