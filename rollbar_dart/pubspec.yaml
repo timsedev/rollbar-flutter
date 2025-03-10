@@ -14,7 +14,6 @@ dependencies:
   sqlite3: ^1.7.0
   collection: ^1.16.0
   stack_trace: ^1.10.0
-  rollbar_common: ^1.1.1
 
 dependency_overrides:
   rollbar_common:
